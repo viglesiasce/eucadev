@@ -12,7 +12,7 @@ OS = CENTOS
 Vagrant.configure("2") do |config|
     config.vm.define "euca-all" do |u|
       u.vm.hostname = "euca-all"
-      u.vm.synced_folder "eucalyptus-src", "/opt/eucalyptus-src"
+      u.vm.synced_folder "eucalyptus-src", "/opt/eucalyptus-src", :create => true
       u.vm.box = OS[:box]
       u.vm.box_url = OS[:url]
       u.vm.network :forwarded_port, guest: 8080, host: 8080
