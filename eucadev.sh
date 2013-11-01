@@ -1,10 +1,11 @@
-#!/bin/bash -e
+#!/bin/bash -x
 
 export IP=$(/sbin/ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | cut -d' ' -f1)
 export PYTHONUNBUFFERED=1 # so ansible-playbook output appears "live"
-export EUCALYPTUS_SRC=/opt/eucalyptus-src
+export EUCALYPTUS_SRC=/root/eucalyptus
 export EUCALYPTUS=/opt/eucalyptus
 export DEST=/opt
+export EPHEMERAL=/dev/vdb
 
 msg() {  # a colorful status output, with a timestamp
     echo
@@ -15,9 +16,15 @@ msg() {  # a colorful status output, with a timestamp
     echo
 }
 
+if [ -e $EPHEMERAL ]; then
+    msg "Detected ephemeral space. Mounting for use."
+    mkfs.ext4 -F $EPHEMERAL
+    mount $EPHEMERAL $DEST
+fi
+
 msg "enabling password-less login on the node for root"
 ssh-keygen -f /root/.ssh/id_rsa -P ''
-cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 chmod og-r /root/.ssh/authorized_keys
 ssh-keyscan $IP >> /root/.ssh/known_hosts
 
@@ -25,10 +32,8 @@ msg "installing EPEL repo, needed for PyYAML, which is needed for ansible"
 yum install -y http://mirror.ancl.hawaii.edu/linux/epel/6/i386/epel-release-6-8.noarch.rpm
 
 msg "installing git and then ansible, via git"
-yum install -y git PyYAML python-jinja2 python-paramiko # ansible deps
-git clone git://github.com/ansible/ansible.git $DEST/ansible
+yum install -y git ansible
 echo "$IP" > /root/ansible_hosts
-source $DEST/ansible/hacking/env-setup
 
 msg "installing Euca cloud-playbook and configuring it"
 git clone https://github.com/mspaulding06/cloud-playbook $DEST/cloud-playbook
@@ -53,7 +58,6 @@ machine00
 [node_controller]
 machine00
 " >$DEST/cloud-playbook/cloud_hosts
-ln -s $EUCALYPTUS_SRC /root/eucalyptus # playbook puts Euca source into /root
 
 msg "running Euca cloud-playbook: this will take a *while*"
 ansible-playbook --verbose $DEST/cloud-playbook/playbooks/source.yml --inventory-file=$DEST/cloud-playbook/cloud_hosts
