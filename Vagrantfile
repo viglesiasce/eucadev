@@ -10,8 +10,8 @@ CENTOS = {
 }
 OS = CENTOS
 Vagrant.configure("2") do |config|
-    config.vm.define "euca-all" do |u|
-      u.vm.hostname = "euca-all"
+    config.vm.define "eucadev-all" do |u|
+      u.vm.hostname = "eucadev-all"
       u.vm.synced_folder "eucalyptus-src", "/opt/eucalyptus-src", :create => true
       u.vm.box = OS[:box]
       u.vm.box_url = OS[:url]
@@ -20,6 +20,7 @@ Vagrant.configure("2") do |config|
       u.vm.network :forwarded_port, guest: 8773, host: 8773
       u.vm.network :forwarded_port, guest: 8774, host: 8774
       u.vm.network :forwarded_port, guest: 8775, host: 8775
+      u.vm.network :private_network, ip: "192.168.192.101"
       u.vm.provider :virtualbox do |v| 
             v.customize ["modifyvm", :id, "--memory", options[:memory].to_i]
       	    v.customize ["modifyvm", :id, "--cpus", options[:cores].to_i]

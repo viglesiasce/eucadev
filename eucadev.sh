@@ -34,8 +34,8 @@ msg "installing Euca cloud-playbook and configuring it"
 git clone https://github.com/mspaulding06/cloud-playbook $DEST/cloud-playbook
 cp $DEST/cloud-playbook/examples/cloud_config.yml $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s/^ntp_server:.*$/ntp_server: pool.ntp.org/" $DEST/cloud-playbook/cloud_config.yml
-sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: add-qemu/" $DEST/cloud-playbook/cloud_config.yml
-sed -i -e "s#^eucalyptus_github_repo:.*\$#eucalyptus_github_repo: https://github.com/dmitrii/eucalyptus.git#" $DEST/cloud-playbook/cloud_config.yml
+sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: master/" $DEST/cloud-playbook/cloud_config.yml
+sed -i -e "s#^eucalyptus_github_repo:.*\$#eucalyptus_github_repo: https://github.com/eucalyptus/eucalyptus.git#" $DEST/cloud-playbook/cloud_config.yml
 echo "machine00 ansible_ssh_host=$IP
 
 [cloud_controller]
@@ -83,10 +83,12 @@ msg "installing iSCSI stuff for NC and SC"
 yum install -y scsi-target-utils iscsi-initiator-utils lvm2 device-mapper-multipath
 
 msg "adding a bridge for NC"
-echo "BRIDGE=br0" >>/etc/sysconfig/network-scripts/ifcfg-eth0
+echo "BRIDGE=br0" >>/etc/sysconfig/network-scripts/ifcfg-eth1
 echo "DEVICE=br0
 TYPE=Bridge
-BOOTPROTO=dhcp
+BOOTPROTO=static
+IPADDR=192.168.192.101
+NETMASK=255.255.255.0
 ONBOOT=yes
 DELAY=0" >/etc/sysconfig/network-scripts/ifcfg-br0
 service network restart
