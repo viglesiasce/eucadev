@@ -52,5 +52,5 @@ edited on the host system but built on the guest system.
    ```
    vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
    ```
-6. Once inside the repository run "vagrant up --provider=aws". This will run a virtual machine, and install the Eucalyptus development environmen in your cloud.
+6. Once inside the repository run "vagrant up --provider=aws". This will run a virtual machine, and install the Eucalyptus development environment in your cloud.
 
