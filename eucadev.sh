@@ -132,7 +132,7 @@ source eucarc
 euca-describe-availability-zones verbose
 
 msg "installing a test image"
-eustore-install-image -b my-first-image -i $(eustore-describe-images | egrep "centos.*x86_64.*starter.*kvm" | head -1 | cut -f 1)
+eustore-install-image -b my-first-image -i $(eustore-describe-images | egrep "cirros.*x86_64.*experimental.*kvm" | head -1 | cut -f 1)
 
 msg "adding an ssh keypair"
 euca-create-keypair my-first-keypair >/root/my-first-keypair
