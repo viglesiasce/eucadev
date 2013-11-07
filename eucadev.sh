@@ -39,7 +39,7 @@ msg "installing Euca cloud-playbook and configuring it"
 git clone https://github.com/mspaulding06/cloud-playbook $DEST/cloud-playbook
 cp $DEST/cloud-playbook/examples/cloud_config.yml $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s/^ntp_server:.*$/ntp_server: pool.ntp.org/" $DEST/cloud-playbook/cloud_config.yml
-sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: master/" $DEST/cloud-playbook/cloud_config.yml
+sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: testing/" $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s#^eucalyptus_github_repo:.*\$#eucalyptus_github_repo: https://github.com/eucalyptus/eucalyptus.git#" $DEST/cloud-playbook/cloud_config.yml
 echo "machine00 ansible_ssh_host=$IP
 
