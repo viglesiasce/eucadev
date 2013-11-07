@@ -112,17 +112,7 @@ echo "export PATH=$PATH:$EUCALYPTUS/usr/sbin/" >>/root/.bashrc # so admin comman
 export PATH=$PATH:$EUCALYPTUS/usr/sbin/ # so euca_conf can be found below
 
 msg "driving Euca configuration with Eutester"
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests initialize_db
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests sync_ssh_keys
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests remove_host_check
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests start_components
-# NC will complain about lack of keys on start-up, that's okay
-#
-# feature request: "Sleeping for 180 seconds" at end of start_components should be removed / be made optional
-#
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests wait_for_creds
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests register_components
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests set_block_storage_manager
+python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests initialize_db sync_ssh_keys remove_host_check configure_network start_components wait_for_creds register_components set_block_storage_manager --vnet-publicips "172.16.1.1-172.16.1.20"
 
 msg "getting credentials from a running Euca installation"
 euca_conf --get-credentials /root/creds.zip
@@ -132,7 +122,7 @@ source eucarc
 euca-describe-availability-zones verbose
 
 msg "installing a test image"
-eustore-install-image -b my-first-image -i $(eustore-describe-images | egrep "centos.*x86_64.*starter.*kvm" | head -1 | cut -f 1)
+eustore-install-image -b my-first-image -i $(eustore-describe-images | egrep "cirros.*kvm" | head -1 | cut -f 1)
 
 msg "adding an ssh keypair"
 euca-create-keypair my-first-keypair >/root/my-first-keypair
