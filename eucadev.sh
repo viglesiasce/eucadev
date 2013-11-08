@@ -84,7 +84,7 @@ echo "* hard nproc 64000" >>/etc/security/limits.conf
 rm /etc/security/limits.d/90-nproc.conf # these apparently override limits.conf?
 
 msg "installing QEMU for NC and adding 'eucalyptus' to 'kvm' group"
-yum install -y libvirt kvm bc # why is 'bc' needed?! Vic said so.
+yum install -y libvirt kvm bc dhcp # why is 'bc' needed?! Vic said so.
 usermod -a -G kvm eucalyptus
 
 msg "installing iSCSI stuff for NC and SC"
