@@ -28,6 +28,10 @@ cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 chmod og-r /root/.ssh/authorized_keys
 ssh-keyscan $IP >> /root/.ssh/known_hosts
 
+msg "Disabling SElinux"
+setenforce 0
+sed -i -e "s/^SELINUX=enforcing.*$/SELINUX=disabled/" /etc/sysconfig/selinux
+
 msg "installing EPEL repo, needed for PyYAML, which is needed for ansible"
 yum install -y http://mirror.ancl.hawaii.edu/linux/epel/6/i386/epel-release-6-8.noarch.rpm
 
