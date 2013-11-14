@@ -24,6 +24,8 @@ Vagrant.configure("2") do |config|
             v.customize ["modifyvm", :id, "--memory", options[:memory].to_i]
       	    v.customize ["modifyvm", :id, "--cpus", options[:cores].to_i]
       end
+      u.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth1"
+
       u.vm.provider :aws do |aws,override|
         aws.access_key_id = "XXXXXXXXXXXXXXXXXXXXXXXX"
         aws.secret_access_key = "YYYYYYYYYYYYYYYYYYYYYYYYYY"
@@ -42,7 +44,7 @@ Vagrant.configure("2") do |config|
         aws.tags = {
                 Name: "EucaDev",
         }
+	override.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth0"
       end 
-      u.vm.provision :shell, :path => "eucadev.sh"
     end
 end

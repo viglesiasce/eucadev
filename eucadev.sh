@@ -1,4 +1,12 @@
-#!/bin/bash -x
+#!/bin/bash
+
+# parse comand-line parameters
+#
+# the only parameter is the ethernet device to use inside the VM/instance
+eth=$1
+if [ "$eth" != "eth0" -a "$eth" != "eth1" ]; then
+    echo "eucadev.sh expects one parameter: { eth0 | eth1 }"; exit 1
+fi
 
 export IP=$(/sbin/ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | cut -d' ' -f1)
 export PYTHONUNBUFFERED=1 # so ansible-playbook output appears "live"
@@ -29,13 +37,13 @@ chmod og-r /root/.ssh/authorized_keys
 ssh-keyscan $IP >> /root/.ssh/known_hosts
 
 msg "Disabling SElinux"
-setenforce 0
+setenforce 0 || true;
 sed -i -e "s/^SELINUX=enforcing.*$/SELINUX=disabled/" /etc/sysconfig/selinux
 
-msg "installing EPEL repo, needed for PyYAML, which is needed for ansible"
-yum install -y http://mirror.ancl.hawaii.edu/linux/epel/6/i386/epel-release-6-8.noarch.rpm
+msg "installing EPEL repo"
+yum install -y http://mirror.ancl.hawaii.edu/linux/epel/6/i386/epel-release-6-8.noarch.rpm || true;
 
-msg "installing git and then ansible, via git"
+msg "installing git and ansible"
 yum install -y git ansible
 echo "$IP" > /root/ansible_hosts
 
@@ -65,6 +73,10 @@ machine00
 
 msg "running Euca cloud-playbook: this will take a *while*"
 ansible-playbook --verbose $DEST/cloud-playbook/playbooks/source.yml --inventory-file=$DEST/cloud-playbook/cloud_hosts
+if [ $? -ne 0 ]; then
+        msg "error during source install, aboring eucadev.sh"
+	exit 1
+fi
 
 # setting things up for Euca to run (this should eventually be moved into playbooks or eutester or somewhere else)
 
@@ -83,23 +95,42 @@ echo "* soft nproc 64000" >>/etc/security/limits.conf
 echo "* hard nproc 64000" >>/etc/security/limits.conf
 rm /etc/security/limits.d/90-nproc.conf # these apparently override limits.conf?
 
+msg "installing DHCP daemon for CC"
+yum install -y dhcp
+
 msg "installing QEMU for NC and adding 'eucalyptus' to 'kvm' group"
-yum install -y libvirt kvm bc dhcp # why is 'bc' needed?! Vic said so.
+yum install -y libvirt kvm bc # why is 'bc' needed?! Vic said so.
 usermod -a -G kvm eucalyptus
 
 msg "installing iSCSI stuff for NC and SC"
 yum install -y scsi-target-utils iscsi-initiator-utils lvm2 device-mapper-multipath
 
 msg "adding a bridge for NC"
-echo "BRIDGE=br0" >>/etc/sysconfig/network-scripts/ifcfg-eth1
+echo "BRIDGE=br0
+ONBOOT=yes
+DELAY=0" >>/etc/sysconfig/network-scripts/ifcfg-${eth}
 echo "DEVICE=br0
 TYPE=Bridge
-BOOTPROTO=static
-IPADDR=192.168.192.101
-NETMASK=255.255.255.0
 ONBOOT=yes
 DELAY=0" >/etc/sysconfig/network-scripts/ifcfg-br0
+if [ "$eth" == "eth1" ]; then # for eth1 we assume no DHCP and no traffic external to VM
+    echo "BOOTPROTO=static
+IPADDR=192.168.192.101
+NETMASK=255.255.255.0" >>/etc/sysconfig/network-scripts/ifcfg-br0
+#    iptables -A OUTPUT -o eth1 -j DROP
+#    iptables -A FORWARD -o eth1 -j DROP
+#    /etc/init.d/iptables save
+    ebtables -I FORWARD -o eth1 -j DROP
+    ebtables -I OUTPUT -o eth1 -j DROP
+    /etc/init.d/ebtables save
+    chkconfig --level 345 ebtables on
+fi
 service network restart
+
+msg "ensuring Euca components will restart automatically on reboot"
+chkconfig --level 345 eucalyptus-nc on
+chkconfig --level 345 eucalyptus-cc on
+chkconfig --level 345 eucalyptus-cloud on
 
 msg "policykit/dbus woodoo for NC to talk to libvirt"
 cp $EUCALYPTUS_SRC/tools/eucalyptus-nc-libvirt.pkla \
@@ -118,7 +149,11 @@ echo "export PATH=$PATH:$EUCALYPTUS/usr/sbin/" >>/root/.bashrc # so admin comman
 export PATH=$PATH:$EUCALYPTUS/usr/sbin/ # so euca_conf can be found below
 
 msg "driving Euca configuration with Eutester"
-python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests initialize_db sync_ssh_keys remove_host_check configure_network start_components wait_for_creds register_components set_block_storage_manager --vnet-publicips "172.16.1.1-172.16.1.20"
+python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutester/config --tests initialize_db sync_ssh_keys remove_host_check configure_network start_components wait_for_creds register_components set_block_storage_manager --vnet-publicips "192.168.192.102-192.168.192.121"
+#if [ $? -ne 0 ]; then
+#        msg "error during configuration, aboring eucadev.sh"
+#	exit 1
+#fi
 
 msg "getting credentials from a running Euca installation"
 euca_conf --get-credentials /root/creds.zip
@@ -133,6 +168,10 @@ eustore-install-image -b my-first-image -i $(eustore-describe-images | egrep "ci
 msg "adding an ssh keypair"
 euca-create-keypair my-first-keypair >/root/my-first-keypair
 chmod 0600 /root/my-first-keypair
+
+msg "authorizing SSH and ICMP traffic for default security group"
+euca-authorize -P icmp -t -1:-1 -s 0.0.0.0/0 default
+euca-authorize -P tcp -p 22 -s 0.0.0.0/0 default
 
 msg "running an instance"
 euca-run-instances -k my-first-keypair $(euca-describe-images | grep my-first-image | grep emi | cut -f 2)
