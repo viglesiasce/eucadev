@@ -48,7 +48,7 @@ yum install -y git ansible
 echo "$IP" > /root/ansible_hosts
 
 msg "installing Euca cloud-playbook and configuring it"
-git clone https://github.com/mspaulding06/cloud-playbook $DEST/cloud-playbook
+git clone https://github.com/eucalyptus/cloud-playbook $DEST/cloud-playbook
 cp $DEST/cloud-playbook/examples/cloud_config.yml $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s/^ntp_server:.*$/ntp_server: pool.ntp.org/" $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: testing/" $DEST/cloud-playbook/cloud_config.yml
@@ -141,6 +141,7 @@ service messagebus restart
 msg "installing and configuring eutester for an all-in-one Euca deployment"
 git clone https://github.com/eucalyptus/eutester.git $DEST/eutester
 pushd $DEST/eutester
+git checkout testing # so we are using the latest bits
 python setup.py install # apparently, this doesn't work with an absolute path?
 popd
 echo "$IP CENTOS 6.4 64 BZR [CC00 CLC SC00 WS NC00]" >$DEST/eutester/config
