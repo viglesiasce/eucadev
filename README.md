@@ -5,9 +5,9 @@ _Tools for Eucalyptus developers and testers._ This collection of tools allows o
 
 
 
-## Dev/Test environment in a VirtualBox VM
+## Dev/test environment in a VirtualBox VM
 
-The following method will give you a development environment 
+The following method will give you a dev/test environment 
 in a single virtual machine, with all components deployed in it.
 The components will be built from latest source, which can be 
 modified and immediately tested on the VM. The source will 
@@ -28,16 +28,26 @@ edited on the host system but built on the guest system.
 
         cd eucadev; vagrant up
         
-### What now?
+#### What now?
 
 * Connect to the Eucalyptus admin console from the browser on the host: `https://localhost:8443`
 
-* Install [euca2ools](https://github.com/eucalyptus/euca2ools) and control your cloud from the command line:
+* Install [euca2ools](https://github.com/eucalyptus/euca2ools) on your host and control the cloud from the command line:
 
         cd eucadev; source creds/eucarc
         euca-describe-availability-zones verbose
         
-## Dev/Test environment in AWS or Eucalyptus clouds
+        
+        
+        
+## Dev/test environment in AWS or Eucalyptus
+
+The following method will give you a dev/test environment 
+in a single cloud instance, with all components deployed in it.
+(Yes, you can run a Eucalyptus cloud in a Eucalyptus cloud or
+in an Amazon cloud.)
+The components will be built from latest source, which can be 
+modified and immediately tested on the VM.
 
 1. Install [Vagrant](http://www.vagrantup.com/)
 
