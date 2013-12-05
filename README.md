@@ -22,20 +22,27 @@ edited on the host system but built on the guest system.
 
 4. Check out [eucadev](https://github.com/eucalyptus/eucadev) (ideally [fork](http://help.github.com/fork-a-repo/) it and clone the fork to your local machine, so you can contribute):
 
-        git clone https://github.com/eucalyptus/eucadev.git
+        $ git clone https://github.com/eucalyptus/eucadev.git
 
 5. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _over 30 min_):
 
-        cd eucadev; vagrant up
+        $ cd eucadev; vagrant up
         
 #### What now?
 
-* Connect to the Eucalyptus admin console from the browser on the host: `https://localhost:8443`
-
+* Connect to the Eucalyptus admin console: 
+  * In a Web browser on your host, go to `https://localhost:8443`
+  * Accept the untrusted server certificate
+  * Use `admin` for _both_ login and password
+  * After a forced change of the password to something other than `admin` you'll be good to go
+  
 * Install [euca2ools](https://github.com/eucalyptus/euca2ools) on your host and control the cloud from the command line:
 
-        cd eucadev; source creds/eucarc
-        euca-describe-availability-zones verbose
+        $ source creds/eucarc
+        $ euca-describe-instances 
+        RESERVATION	r-49C1448D	539043227142	default
+        INSTANCE	i-E4C54166	emi-34793865	192.168.192.102	1.0.217.179	running	my-first-keypair	0		m1.small	2013-12-05T23:11:59.118Z	cluster1	eki-58DF396F	eri-BB603B1C		        monitoring-disabled	192.168.192.102	1.0.217.179			instance-store					paravirtualized				
+        TAG	instance	i-E4C54166	euca:node	10.0.2.15
         
         
         
@@ -56,7 +63,7 @@ modified and immediately tested on the VM.
         vagrant plugin install vagrant-aws
 3. Check out [eucadev](https://github.com/eucalyptus/eucadev) (ideally [fork](http://help.github.com/fork-a-repo/) it and clone the fork to your local machine, so you can contribute)
 
-        git clone https://github.com/eucalyptus/eucadev.git
+        $ git clone https://github.com/eucalyptus/eucadev.git
         
 4. Edit the following parameters in `eucadev/Vagrantfile`:
  
@@ -77,8 +84,8 @@ modified and immediately tested on the VM.
 
 5. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
 
-        vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+        $ vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
         
 6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _over 30 min_):
         
-        cd eucadev; vagrant up --provider=aws
+        $ cd eucadev; vagrant up --provider=aws
