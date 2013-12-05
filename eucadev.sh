@@ -53,6 +53,8 @@ cp $DEST/cloud-playbook/examples/cloud_config.yml $DEST/cloud-playbook/cloud_con
 sed -i -e "s/^ntp_server:.*$/ntp_server: pool.ntp.org/" $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: testing/" $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s#^eucalyptus_github_repo:.*\$#eucalyptus_github_repo: https://github.com/eucalyptus/eucalyptus.git#" $DEST/cloud-playbook/cloud_config.yml
+# temporary fix to allow the Centos 6.4 spec to be used (6.5 spec is missing 'java7')
+sed -i -e "s#^spec_url:.*\$#spec_url: https://raw.github.com/eucalyptus/eucalyptus-rpmspec/maint/3.4/testing/eucalyptus.spec#" $DEST/cloud-playbook/playbooks/vars/cloud_defaults.yml
 echo "machine00 ansible_ssh_host=$IP
 
 [cloud_controller]
