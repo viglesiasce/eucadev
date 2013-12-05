@@ -1,7 +1,9 @@
 eucadev
 =======
 
-Tools for Eucalyptus developers
+_Tools for Eucalyptus developers and testers._ This collection of tools allows one to deploy a Eucalyptus cloud in a virtual environment—a Vagrant-provisioned VM or a AWS/Eucalyptus-provisioned instance—with minimal effort. Currently, only single-node installations are supported, but we have plans to support multiple nodes, bare-metal provisioining, etc.
+
+
 
 ## Dev environment in a  VirtualBox VM
 
@@ -13,26 +15,35 @@ be located on a 'synced folder' (eucalyptus-src), which can be
 edited on the host system but built on the guest system.
 
 1. Install [VirtualBox](https://www.virtualbox.org)
-1. Install [Vagrant](http://www.vagrantup.com/)
-1. Install [git](http://git-scm.com)
-1. Check out [eucadev](https://github.com/eucalyptus/eucadev) (ideally [fork](http://help.github.com/fork-a-repo/) it so you can contribute)
-   - `git clone https://github.com/eucalyptus/eucadev.git`
-1. Start the VM and wait for it to build (may take a long time, _over 30 min_)
-   - `cd eucadev; vagrant up`
+
+2. Install [Vagrant](http://www.vagrantup.com/)
+
+3. Install [git](http://git-scm.com)
+
+4. Check out [eucadev](https://github.com/eucalyptus/eucadev) (ideally [fork](http://help.github.com/fork-a-repo/) it and clone the fork to your local machine, so you can contribute):
+
+        git clone https://github.com/eucalyptus/eucadev.git
+
+5. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _over 30 min_):
+
+        cd eucadev; vagrant up
+        
+        
+
 
 ## Setting up with AWS or Eucalyptus
-1.  Download and install [Vagrant](http://www.vagrantup.com/)
 
-2. Install the Vagrant-AWS plugin: 
-   ```
-	vagrant plugin install vagrant-aws
-   ```
+1. Install [Vagrant](http://www.vagrantup.com/)
 
-3. Do a fork of eucadev project (requires github account for information on how to set up a Github account, refer to the following URL: [http://help.github.com/set-up-git-redirect/](http://help.github.com/set-up-git-redirect/)).  On information on how to fork a project, refer to the following link: [http://help.github.com/fork-a-repo/](http://help.github.com/fork-a-repo/).
+2. Install the Vagrant-AWS plugin:
 
-4. Clone your fork to your local machine.
+        vagrant plugin install vagrant-aws
+3. Check out [eucadev](https://github.com/eucalyptus/eucadev) (ideally [fork](http://help.github.com/fork-a-repo/) it and clone the fork to your local machine, so you can contribute)
 
-5. Edit the following parameters in the Vagrantfile:
+        git clone https://github.com/eucalyptus/eucadev.git
+        
+4. Edit the following parameters in `eucadev/Vagrantfile`:
+ 
     ```     
     aws.access_key_id = "XXXXXXXXXXXXXXXXXX"
     aws.secret_access_key = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
@@ -48,9 +59,10 @@ edited on the host system but built on the guest system.
     override.ssh.private_key_path ="/Users/viglesias/.ssh/id_rsa"
     ```
 
-6. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
-   ```
-   vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
-   ```
-6. Once inside the repository run "vagrant up --provider=aws". This will run a virtual machine, and install the Eucalyptus development environment in your cloud.
+5. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
 
+        vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+        
+6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _over 30 min_):
+        
+        cd eucadev; vagrant up --provider=aws
