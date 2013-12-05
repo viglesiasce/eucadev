@@ -157,10 +157,13 @@ python $DEST/eutester/testcases/cloud_admin/install_euca.py --config=$DEST/eutes
 #fi
 
 msg "getting credentials from a running Euca installation"
-euca_conf --get-credentials /root/creds.zip
-pushd /root
-unzip creds.zip
-source eucarc
+mkdir -p /vagrant/creds # creds on the host, for external use
+rm -f /vagrant/creds/creds.zip # to make this step idempotent
+euca_conf --get-credentials /vagrant/creds/creds.zip
+unzip -o -d /vagrant/creds /vagrant/creds/creds.zip
+cp /vagrant/creds/* /root # make copy for internal use
+source /root/eucarc
+sed --in-place 's#://[^:]\+:#://127.0.0.1:#g' /vagrant/creds/eucarc # external copy should point to localhost
 euca-describe-availability-zones verbose
 
 msg "installing a test image"
