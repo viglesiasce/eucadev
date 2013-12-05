@@ -44,7 +44,7 @@ edited on the host system but built on the guest system.
         INSTANCE	i-E4C54166	emi-34793865	192.168.192.102	1.0.217.179	running	my-first-keypair	0		m1.small	2013-12-05T23:11:59.118Z	cluster1	eki-58DF396F	eri-BB603B1C		        monitoring-disabled	192.168.192.102	1.0.217.179			instance-store					paravirtualized				
         TAG	instance	i-E4C54166	euca:node	10.0.2.15
         
-        
+  * **Note:** you won't be able to connect to cloud instances from your host, only from inside the VM.
         
         
 ## Dev/test environment in AWS or Eucalyptus
