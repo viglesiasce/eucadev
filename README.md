@@ -60,17 +60,17 @@ This method produces a dev/test environment in a single cloud instance, with all
 
 2. Install the Vagrant-AWS plugin:
 
-        vagrant plugin install vagrant-aws
+        $ vagrant plugin install vagrant-aws
+        
 3. Check out [eucadev](https://github.com/eucalyptus/eucadev) (ideally [fork](http://help.github.com/fork-a-repo/) it and clone the fork to your local machine, so you can contribute)
 
         $ git clone https://github.com/eucalyptus/eucadev.git
         
-4. *Optionally:* Check the default parameters in `Vagrantfile`
+4. Edit the parameters in `eucadev/Vagrantfile` to suit your needs:
   * `method` of installation is `"source"` by default. Set the value to `"package"` for an RPM-based installation,  which can take less than half the time of a source install, but won't allow you to edit and re-deploy code easily.
-  * Consider whether the instance type you are selecting (`m1.medium` is the default for `aws.instance_type`) has sufficient memory for your Eucalyptus cloud. For a source-based install without a Web console, you may be able to get away with 1GB, but we recommend 3GB for a typical installation. Selecting a beefier instance should improve performance.
+  * `aws.instance_type` is `m1.medium` by default. Consider whether this instance type has sufficient memory for your Eucalyptus cloud. For a source-based install without a Web console, you may be able to get away with 1GB, but we recommend 3GB for a typical installation. Selecting a beefier instance should improve performance
+  * Change the other variables to match the parameters of the cloud that you would like to use:
 
-5. Edit the following parameters in `eucadev/Vagrantfile`:
- 
     ```     
     aws.access_key_id = "XXXXXXXXXXXXXXXXXX"
     aws.secret_access_key = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
@@ -85,11 +85,10 @@ This method produces a dev/test environment in a single cloud instance, with all
     override.ssh.username ="root"
     override.ssh.private_key_path ="/Users/viglesias/.ssh/id_rsa"
     ```
-
-6. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
+5. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
 
         $ vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
         
-7. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
+6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
         
         $ cd eucadev; vagrant up --provider=aws
