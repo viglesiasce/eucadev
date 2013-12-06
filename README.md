@@ -1,19 +1,12 @@
-eucadev
-=======
+### **eucadev** ➠ _tools for Eucalyptus developers and testers_
 
-_Tools for Eucalyptus developers and testers._ This collection of tools allows one to deploy a Eucalyptus cloud in a virtual environment—a Vagrant-provisioned VM or a AWS/Eucalyptus-provisioned instance—with minimal effort. Currently, only single-node installations are supported, but we have plans to support multiple nodes, bare-metal provisioining, etc.
-
+These tools allows one to deploy a Eucalyptus cloud—in a Vagrant-provisioned VM or in an AWS/Eucalyptus-provisioned instance—with minimal effort. Currently, only single-node installations in virtual resources are supported, but we have plans to support multiple nodes, bare-metal provisioining, and more.
 
 
-## Dev/test environment in a VirtualBox VM
 
-The following method will give you a dev/test environment 
-in a single virtual machine, with all components deployed in it.
-By default, components will be built from latest source, which can be 
-modified and immediately tested on the VM. (See the note below for
-package-based installation.) The source will 
-be located on a 'synced folder' (eucalyptus-src), which can be
-edited on the host system but built on the guest system.
+### Dev/test environment in a VirtualBox VM
+
+This method produces a dev/test environment in a single virtual machine, with all Eucalyptus components deployed in it. By default, components will be built from latest source, which can be modified and immediately tested on the VM.  The source will be located on a 'synced folder' (`eucalyptus-src`), which can be edited on the host system but built on the guest system. Alternatively, you can install from latest packages, saving time.
 
 1. Install [VirtualBox](https://www.virtualbox.org)
 
@@ -26,18 +19,18 @@ edited on the host system but built on the guest system.
         $ git clone https://github.com/eucalyptus/eucadev.git
 
 5. *Optionally:* Check the default parameters in `Vagrantfile`
-  * `method` of installation is `"source"` by default. Set the value to `"package"` for an RPM-based installation,  which can take less than half the time of a source install (e.g., 20 min instead of 48), but won't allow you to edit the re-deploy code easily.
-  * `memory` is 3GB (`3072`) by default. For a source-based install without a Web console you may be able to get away with less, like 1GB. Giving the VM more should improve performance.
+  * `method` of installation is `"source"` by default. Set the value to `"package"` for an RPM-based installation,  which can take less than half the time of a source install (e.g., 20 min instead of 48), but won't allow you to edit and re-deploy code easily.
+  * `memory` is 3GB (`3072`) by default. For a source-based install without a Web console, you may be able to get away with less, such as 1GB. Giving the VM more should improve performance.
 
 6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
 
         $ cd eucadev; vagrant up
         
-#### What now?
+##### What now?
 
-* If test instance started successfully, you can try connecting to it via SSH:
+* If the test instance started successfully, you can try connecting to it via SSH:
   * Connect to the VM hosting the cloud: `$ vagrant ssh`
-  * Change to root to be able to read the SSH key: `$ sudo bash`
+  * Become `root` to read the credentials: `$ sudo bash`
   * Source the Eucalyptus configuration file: `# source /root/eucarc`
   * Look up the IP of the running instnace: `# euca-describe-instances `
   * Connect to the instance from the VM: `# ssh -k /root/my-first-keypair root@PUBLIC-IP-OF-THE-INSTANCE`
@@ -59,7 +52,7 @@ edited on the host system but built on the guest system.
   * **Note:** you won't be able to connect to cloud instances from your host, only from inside the VM.
         
         
-## Dev/test environment in AWS or Eucalyptus
+### Dev/test environment in AWS or Eucalyptus
 
 The following method will give you a dev/test environment 
 in a single cloud instance, with all components deployed in it.
