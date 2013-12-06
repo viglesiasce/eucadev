@@ -202,7 +202,11 @@ unzip -o -d /vagrant/creds /vagrant/creds/creds.zip
 cp /vagrant/creds/* /root # make copy for internal use
 source /root/eucarc
 sed --in-place 's#://[^:]\+:#://127.0.0.1:#g' /vagrant/creds/eucarc # external copy should point to localhost
-euca-describe-availability-zones verbose
+euca-describe-availability-zones
+if [ $? -ne 0 ]; then
+    msg "error obtaining list of availability zones, aboring eucadev.sh"
+    exit 1
+fi
 
 msg "installing a test image"
 eustore-install-image -b my-first-image -i $(eustore-describe-images | egrep "cirros.*kvm" | head -1 | cut -f 1)
@@ -214,6 +218,14 @@ chmod 0600 /root/my-first-keypair
 msg "authorizing SSH and ICMP traffic for default security group"
 euca-authorize -P icmp -t -1:-1 -s 0.0.0.0/0 default
 euca-authorize -P tcp -p 22 -s 0.0.0.0/0 default
+
+# wait for describe-availability-zones to show more than 0000/0000 resources (it can sometimes take a bit for resources to show up)
+RETRIES=19
+while [ $(euca-describe-availability-zones verbose | grep m1.small | cut -f 3 | cut -f 1 -d ' ') -eq 0 -a $RETRIES -gt 0 ]; do
+    msg "waiting for resources to become available on the cluster ($RETRIES retries left)"
+    let RETRIES=RETRIES-1
+    sleep 10
+done
 
 msg "running an instance"
 euca-run-instances -k my-first-keypair $(euca-describe-images | grep my-first-image | grep emi | cut -f 2)
