@@ -1,19 +1,27 @@
 #!/bin/bash
 
+#
 # parse comand-line parameters
 #
-# the only parameter is the ethernet device to use inside the VM/instance
-eth=$1
-if [ "$eth" != "eth0" -a "$eth" != "eth1" ]; then
-    echo "eucadev.sh expects one parameter: { eth0 | eth1 }"; exit 1
+
+# 1) the ethernet device to use inside the VM/instance
+ETH=$1
+
+if [ "$ETH" != "eth0" -a "$ETH" != "eth1" ]; then
+    echo "ERROR: eucadev.sh expects ethernet device name as first parameter: { eth0 | eth1 }"; exit 1
 fi
 
-export IP=$(/sbin/ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | cut -d' ' -f1)
-export PYTHONUNBUFFERED=1 # so ansible-playbook output appears "live"
-export EUCALYPTUS_SRC=/root/eucalyptus
-export EUCALYPTUS=/opt/eucalyptus
-export DEST=/opt
-export EPHEMERAL=/dev/vdb
+# 2) the build method [ source | package ]
+METHOD=$2
+
+if [ "$METHOD" == "source" ]; then
+    export EUCALYPTUS_SRC=/root/eucalyptus
+    export EUCALYPTUS=/opt/eucalyptus
+elif [ "$METHOD" == "package" ]; then
+    export EUCALYPTUS=/
+else
+    echo "ERROR: $0 expects build method as second parameter: { source | package }"; exit 1
+fi
 
 msg() {  # a colorful status output, with a timestamp
     echo
@@ -23,6 +31,12 @@ msg() {  # a colorful status output, with a timestamp
     echo -e "\e[0m" # turn off color
     echo
 }
+msg "beginning Eucalyptus installation using ${METHOD}s"
+
+export IP=$(/sbin/ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | cut -d' ' -f1)
+export PYTHONUNBUFFERED=1 # so ansible-playbook output appears "live"
+export DEST=/opt
+export EPHEMERAL=/dev/vdb
 
 if [ -e $EPHEMERAL ]; then
     msg "Detected ephemeral space. Mounting for use."
@@ -53,8 +67,7 @@ cp $DEST/cloud-playbook/examples/cloud_config.yml $DEST/cloud-playbook/cloud_con
 sed -i -e "s/^ntp_server:.*$/ntp_server: pool.ntp.org/" $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s/^eucalyptus_commit_ref:.*$/eucalyptus_commit_ref: testing/" $DEST/cloud-playbook/cloud_config.yml
 sed -i -e "s#^eucalyptus_github_repo:.*\$#eucalyptus_github_repo: https://github.com/eucalyptus/eucalyptus.git#" $DEST/cloud-playbook/cloud_config.yml
-# temporary fix to allow the Centos 6.4 spec to be used (6.5 spec is missing 'java7')
-sed -i -e "s#^spec_url:.*\$#spec_url: https://raw.github.com/eucalyptus/eucalyptus-rpmspec/maint/3.4/testing/eucalyptus.spec#" $DEST/cloud-playbook/playbooks/vars/cloud_defaults.yml
+
 echo "machine00 ansible_ssh_host=$IP
 
 [cloud_controller]
@@ -73,49 +86,39 @@ machine00
 machine00
 " >$DEST/cloud-playbook/cloud_hosts
 
+#
+# A couple of playbook tweaks that are temporarily necessary (FIXME)
+#
+# 1) Allow the Centos 6.4 spec to be used (6.5 spec is missing 'java7')
+sed -i -e "s#^spec_url:.*\$#spec_url: https://raw.github.com/eucalyptus/eucalyptus-rpmspec/maint/3.4/testing/eucalyptus.spec#" $DEST/cloud-playbook/playbooks/vars/cloud_defaults.yml
+# 2) Disable inclusion of enterprise bits. Without, this package installation stops with this yet-to-be-explained error:
+#    fatal: [machine00] => error while evaluating conditional: {% if vmware_broker in groups %} True {% else %} False {% endif %}
+sed -i -e "s/- include: enterprise.yml/#- include: enterprise.yml/" $DEST/cloud-playbook/playbooks/roles/clc_package/tasks/main.yml
+sed -i -e "s/  when: install_enterprise == true/#  when: install_enterprise == true/" $DEST/cloud-playbook/playbooks/roles/clc_package/tasks/main.yml
+
 msg "running Euca cloud-playbook: this will take a *while*"
-ansible-playbook --verbose $DEST/cloud-playbook/playbooks/source.yml --inventory-file=$DEST/cloud-playbook/cloud_hosts
+ansible-playbook --verbose $DEST/cloud-playbook/playbooks/${METHOD}.yml --inventory-file=$DEST/cloud-playbook/cloud_hosts
 if [ $? -ne 0 ]; then
-        msg "error during source install, aboring eucadev.sh"
+    msg "error during source install, aboring eucadev.sh"
 	exit 1
 fi
 
 # setting things up for Euca to run (this should eventually be moved into playbooks or eutester or somewhere else)
-
-msg "switching ownership from 'root' to 'eucalyptus' user for $EUCALYPTUS"
-chown -R eucalyptus.eucalyptus $EUCALYPTUS
-chown root.eucalyptus $EUCALYPTUS/usr/lib/eucalyptus/euca_*
-chmod 4750 $EUCALYPTUS/usr/lib/eucalyptus/euca_*
-
-msg "setting params in eucalyptus.conf"
-sed -i -e "s#^EUCALYPTUS.*\$#EUCALYPTUS=\"$EUCALYPTUS\"#" $EUCALYPTUS/etc/eucalyptus/eucalyptus.conf
-sed -i -e "s#^HYPERVISOR.*\$#HYPERVISOR=\"qemu\"#" $EUCALYPTUS/etc/eucalyptus/eucalyptus.conf
-sed -i -e "s#^INSTANCE_PATH.*\$#INSTANCE_PATH=\"$EUCALYPTUS/var/lib/eucalyptus/instances\"#" $EUCALYPTUS/etc/eucalyptus/eucalyptus.conf
 
 msg "increasing max process limit to accommodate CLC"
 echo "* soft nproc 64000" >>/etc/security/limits.conf
 echo "* hard nproc 64000" >>/etc/security/limits.conf
 rm /etc/security/limits.d/90-nproc.conf # these apparently override limits.conf?
 
-msg "installing DHCP daemon for CC"
-yum install -y dhcp
-
-msg "installing QEMU for NC and adding 'eucalyptus' to 'kvm' group"
-yum install -y libvirt kvm bc # why is 'bc' needed?! Vic said so.
-usermod -a -G kvm eucalyptus
-
-msg "installing iSCSI stuff for NC and SC"
-yum install -y scsi-target-utils iscsi-initiator-utils lvm2 device-mapper-multipath
-
 msg "adding a bridge for NC"
 echo "BRIDGE=br0
 ONBOOT=yes
-DELAY=0" >>/etc/sysconfig/network-scripts/ifcfg-${eth}
+DELAY=0" >>/etc/sysconfig/network-scripts/ifcfg-${ETH}
 echo "DEVICE=br0
 TYPE=Bridge
 ONBOOT=yes
 DELAY=0" >/etc/sysconfig/network-scripts/ifcfg-br0
-if [ "$eth" == "eth1" ]; then # for eth1 we assume no DHCP and no traffic external to VM
+if [ "$ETH" == "eth1" ]; then # for eth1 we assume no DHCP and no traffic external to VM
     echo "BOOTPROTO=static
 IPADDR=192.168.192.101
 NETMASK=255.255.255.0" >>/etc/sysconfig/network-scripts/ifcfg-br0
@@ -129,14 +132,47 @@ NETMASK=255.255.255.0" >>/etc/sysconfig/network-scripts/ifcfg-br0
 fi
 service network restart
 
-msg "ensuring Euca components will restart automatically on reboot"
-chkconfig --level 345 eucalyptus-nc on
-chkconfig --level 345 eucalyptus-cc on
-chkconfig --level 345 eucalyptus-cloud on
+msg "setting hypervisor to 'qemu' in eucalyptus.conf"
+sed -i -e "s#^HYPERVISOR.*\$#HYPERVISOR=\"qemu\"#" $EUCALYPTUS/etc/eucalyptus/eucalyptus.conf
 
-msg "policykit/dbus woodoo for NC to talk to libvirt"
-cp $EUCALYPTUS_SRC/tools/eucalyptus-nc-libvirt.pkla \
-  /var/lib/polkit-1/localauthority/10-vendor.d/eucalyptus-nc-libvirt.pkla
+if [ "$METHOD" == "source" ]; then
+
+    msg "switching ownership from 'root' to 'eucalyptus' user for $EUCALYPTUS"
+    chown -R eucalyptus.eucalyptus $EUCALYPTUS
+    chown root.eucalyptus $EUCALYPTUS/usr/lib/eucalyptus/euca_*
+    chmod 4750 $EUCALYPTUS/usr/lib/eucalyptus/euca_*
+
+    msg "setting params in eucalyptus.conf"
+    sed -i -e "s#^EUCALYPTUS.*\$#EUCALYPTUS=\"$EUCALYPTUS\"#" $EUCALYPTUS/etc/eucalyptus/eucalyptus.conf
+    sed -i -e "s#^INSTANCE_PATH.*\$#INSTANCE_PATH=\"$EUCALYPTUS/var/lib/eucalyptus/instances\"#" $EUCALYPTUS/etc/eucalyptus/eucalyptus.conf
+
+    msg "installing DHCP daemon for CC"
+    yum install -y dhcp
+
+    msg "installing QEMU for NC and adding 'eucalyptus' to 'kvm' group"
+    yum install -y libvirt kvm bc # why is 'bc' needed?! Vic said so.
+    usermod -a -G kvm eucalyptus
+
+    msg "installing iSCSI stuff for NC and SC"
+    yum install -y scsi-target-utils iscsi-initiator-utils lvm2 device-mapper-multipath
+
+    msg "ensuring Euca components will restart automatically on reboot"
+    chkconfig --level 345 eucalyptus-nc on
+    chkconfig --level 345 eucalyptus-cc on
+    chkconfig --level 345 eucalyptus-cloud on
+
+    msg "policykit woodoo for NC to talk to libvirt"
+    cp $EUCALYPTUS_SRC/tools/eucalyptus-nc-libvirt.pkla \
+      /var/lib/polkit-1/localauthority/10-vendor.d/eucalyptus-nc-libvirt.pkla
+else
+    msg "installing unzip and postgres" # this should be done by the playbook (FIXME)
+    yum install -y postgresql91-server unzip
+
+    msg "soft-linking /opt/eucalyptus to /" # this should not be necessary, but eutester seems to try using /opt/eucalyptus in some cases (FIXME)
+    ln -s / /opt/eucalyptus
+fi
+
+msg "dbus woodoo for NC to talk to libvirt" # this seems to be needed for both source and package installs (FIXME)
 dbus-uuidgen > /var/lib/dbus/machine-id
 service messagebus restart
 

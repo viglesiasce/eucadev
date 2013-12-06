@@ -1,8 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+method = "source" # or "package"
 options = {
   :cores => 2,
-  :memory => 1024,
+  :memory => 3072,
 }
 CENTOS = {
   box: "centos",
@@ -24,7 +25,7 @@ Vagrant.configure("2") do |config|
             v.customize ["modifyvm", :id, "--memory", options[:memory].to_i]
       	    v.customize ["modifyvm", :id, "--cpus", options[:cores].to_i]
       end
-      u.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth1"
+      u.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth1 " + method
 
       u.vm.provider :aws do |aws,override|
         aws.access_key_id = "XXXXXXXXXXXXXXXXXXXXXXXX"
@@ -44,7 +45,7 @@ Vagrant.configure("2") do |config|
         aws.tags = {
                 Name: "EucaDev",
         }
-	override.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth0"
+	override.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth0 " + method
       end 
     end
 end
