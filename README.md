@@ -9,8 +9,9 @@ _Tools for Eucalyptus developers and testers._ This collection of tools allows o
 
 The following method will give you a dev/test environment 
 in a single virtual machine, with all components deployed in it.
-The components will be built from latest source, which can be 
-modified and immediately tested on the VM. The source will 
+By default, components will be built from latest source, which can be 
+modified and immediately tested on the VM. (See the note below for
+package-based installation.) The source will 
 be located on a 'synced folder' (eucalyptus-src), which can be
 edited on the host system but built on the guest system.
 
@@ -24,7 +25,11 @@ edited on the host system but built on the guest system.
 
         $ git clone https://github.com/eucalyptus/eucadev.git
 
-5. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _over 30 min_):
+5. *Optionally:* Check the default parameters in `Vagrantfile`
+  * `method` of installation is `"source"` by default. Set the value to `"package"` for an RPM-based installation,  which can take less than half the time of a source install (e.g., 20 min instead of 48), but won't allow you to edit the re-deploy code easily.
+  * `memory` is 3GB (`3072`) by default. For a source-based install without a Web console you may be able to get away with less, like 1GB. Giving the VM more should improve performance.
+
+6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
 
         $ cd eucadev; vagrant up
         
@@ -93,6 +98,6 @@ modified and immediately tested on the VM.
 
         $ vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
         
-6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _over 30 min_):
+6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
         
         $ cd eucadev; vagrant up --provider=aws
