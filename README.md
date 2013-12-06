@@ -1,6 +1,6 @@
 ### **eucadev** ➠ _tools for Eucalyptus developers and testers_
 
-These tools allows one to deploy a Eucalyptus cloud—in a Vagrant-provisioned VM or in an AWS/Eucalyptus-provisioned instance—with minimal effort. Currently, only single-node installations in virtual resources are supported, but we have plans to support multiple nodes, bare-metal provisioining, and more.
+These tools allow one to deploy a Eucalyptus cloud—in a Vagrant-provisioned VM or in a cloud instance from AWS or Eucalyptus—with minimal effort. Currently, only single-node installations in virtual resources are supported, but we have plans to support multiple nodes, bare-metal provisioining, and more.
 
 
 
@@ -54,12 +54,7 @@ This method produces a dev/test environment in a single virtual machine, with al
         
 ### Dev/test environment in AWS or Eucalyptus
 
-The following method will give you a dev/test environment 
-in a single cloud instance, with all components deployed in it.
-(Yes, you can run a Eucalyptus cloud in a Eucalyptus cloud or
-in an Amazon cloud.)
-The components will be built from latest source, which can be 
-modified and immediately tested on the VM.
+This method produces a dev/test environment in a single cloud instance, with all components deployed in it. (Yes, you can run a Eucalyptus cloud in a Eucalyptus cloud or run a Eucalyptus cloud in an Amazon cloud. _Inception!_) By default, components will be built from latest source, which can be modified and immediately tested on the VM.  Alternatively, you can install from latest packages, saving time.
 
 1. Install [Vagrant](http://www.vagrantup.com/)
 
@@ -70,7 +65,11 @@ modified and immediately tested on the VM.
 
         $ git clone https://github.com/eucalyptus/eucadev.git
         
-4. Edit the following parameters in `eucadev/Vagrantfile`:
+4. *Optionally:* Check the default parameters in `Vagrantfile`
+  * `method` of installation is `"source"` by default. Set the value to `"package"` for an RPM-based installation,  which can take less than half the time of a source install, but won't allow you to edit and re-deploy code easily.
+  * Consider whether the instance type you are selecting (`m1.medium` is the default for `aws.instance_type`) has sufficient memory for your Eucalyptus cloud. For a source-based install without a Web console, you may be able to get away with 1GB, but we recommend 3GB for a typical installation. Selecting a beefier instance should improve performance.
+
+5. Edit the following parameters in `eucadev/Vagrantfile`:
  
     ```     
     aws.access_key_id = "XXXXXXXXXXXXXXXXXX"
@@ -87,10 +86,10 @@ modified and immediately tested on the VM.
     override.ssh.private_key_path ="/Users/viglesias/.ssh/id_rsa"
     ```
 
-5. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
+6. Install a "dummy" vagrant box file to allow override of the box with the ami/emi:
 
         $ vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
         
-6. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
+7. Start the VM and wait for eucadev to install Eucalyptus in it (may take a long time, _20-60 min_ or more):
         
         $ cd eucadev; vagrant up --provider=aws
