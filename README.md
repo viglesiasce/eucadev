@@ -30,6 +30,13 @@ edited on the host system but built on the guest system.
         
 #### What now?
 
+* If test instance started successfully, you can try connecting to it via SSH:
+  * Connect to the VM hosting the cloud: `$ vagrant ssh`
+  * Change to root to be able to read the SSH key: `$ sudo bash`
+  * Source the Eucalyptus configuration file: `# source /root/eucarc`
+  * Look up the IP of the running instnace: `# euca-describe-instances `
+  * Connect to the instance from the VM: `# ssh -k /root/my-first-keypair root@PUBLIC-IP-OF-THE-INSTANCE`
+
 * Connect to the Eucalyptus admin console: 
   * In a Web browser on your host, go to `https://localhost:8443`
   * Accept the untrusted server certificate
