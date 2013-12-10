@@ -54,12 +54,18 @@ msg "Disabling SElinux"
 setenforce 0 || true;
 sed -i -e "s/^SELINUX=enforcing.*$/SELINUX=disabled/" /etc/sysconfig/selinux
 
+msg "setting yum timeout to 120 seconds (default is 30)"
+echo "timeout=120" >> /etc/yum.conf
+
 msg "installing EPEL repo"
 yum install -y http://mirror.ancl.hawaii.edu/linux/epel/6/i386/epel-release-6-8.noarch.rpm || true;
 
 msg "installing git and ansible"
 yum install -y git ansible
 echo "$IP" > /root/ansible_hosts
+
+msg "configuring git to handle potential http.postBuffer issues"
+git config --global http.postBuffer 524288000
 
 msg "installing Euca cloud-playbook and configuring it"
 git clone https://github.com/eucalyptus/cloud-playbook $DEST/cloud-playbook
@@ -99,7 +105,7 @@ sed -i -e "s/  when: install_enterprise == true/#  when: install_enterprise == t
 msg "running Euca cloud-playbook: this will take a *while*"
 ansible-playbook --verbose $DEST/cloud-playbook/playbooks/${METHOD}.yml --inventory-file=$DEST/cloud-playbook/cloud_hosts
 if [ $? -ne 0 ]; then
-    msg "error during source install, aboring eucadev.sh"
+    msg "error during source install, aborting eucadev.sh"
 	exit 1
 fi
 
