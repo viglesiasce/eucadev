@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-method = "source" # or "package"
+method = "source"
+#method = "package"
 options = {
   :cores => 2,
   :memory => 3072,
