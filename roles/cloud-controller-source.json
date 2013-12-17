@@ -9,7 +9,15 @@
       "home-directory": "/opt/eucalyptus",
       "release-rpm": "http://release-repo.eucalyptus-systems.com/releases/eucalyptus/3.4/centos/6/x86_64/eucalyptus-release-internal-3.4-1.el6.noarch.rpm",
       "install-load-balancer": false,
-      "nc" : {"hypervisor" : "qemu"}
+      "nc": {
+        "hypervisor": "qemu",
+        "work-size": "50000"
+      },
+      "network": {
+        "public-interface": "br0",
+        "private-interface": "br0",
+        "public-ips": "10.0.1.200-10.0.1.210"
+      }
     }
   },
   "override_attributes": {
