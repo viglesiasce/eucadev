@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-method = "source" # or "package"
+method = "package" # or "package"
+euca_interface = "eth1"
 options = {
   :cores => 2,
   :memory => 3072,
@@ -11,6 +12,9 @@ CENTOS = {
 }
 OS = CENTOS
 Vagrant.configure("2") do |config|
+    config.omnibus.chef_version = :latest
+    # Utilize the Berkshelf plugin to resolve cookbook dependencies.
+    config.berkshelf.enabled = true
     config.vm.define "eucadev-all" do |u|
       u.vm.hostname = "eucadev-all"
       u.vm.box = OS[:box]
@@ -25,27 +29,26 @@ Vagrant.configure("2") do |config|
             v.customize ["modifyvm", :id, "--memory", options[:memory].to_i]
       	    v.customize ["modifyvm", :id, "--cpus", options[:cores].to_i]
       end
-      u.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth1 " + method
-
       u.vm.provider :aws do |aws,override|
-        aws.access_key_id = "XXXXXXXXXXXXXXXXXXXXXXXX"
-        aws.secret_access_key = "YYYYYYYYYYYYYYYYYYYYYYYYYY"
-        aws.instance_type = "m3.2xlarge"
+	aws.access_key_id = "XXXXXXXXXXXXXXXXXXXXXXX"
+        aws.secret_access_key = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
+        aws.instance_type = "cc1.4xlarge"
         # Optional
-        aws.availability_zone = "two"
-        aws.keypair_name = "my-key"
-        aws.ami = "emi-1873419A"
+        aws.keypair_name = "my-keypair"
+        aws.ami = "emi-MYEMIHERE"
         override.ssh.username ="root"
-        override.ssh.private_key_path ="/path/to/my/key.pem"
         # Optional
-        aws.security_groups = ["Eucalyptus"]
         aws.region = "eucalyptus"
-        aws.endpoint = "http://my-clc-ip:8773/services/Eucalyptus"
-        aws.instance_ready_timeout = 240
+        aws.endpoint = "http://EUCALYPTUS_CLC_IP:8773/services/Eucalyptus"
+        override.ssh.private_key_path ="/path/to/ssh/key"
+        aws.instance_ready_timeout = 480
         aws.tags = {
                 Name: "EucaDev",
-        }
-	override.vm.provision :shell, :inline => "/vagrant/eucadev.sh eth0 " + method
-      end 
-    end
+        } 
+     end 
+     config.vm.provision :chef_solo do |chef|
+          chef.roles_path = "roles" 
+          chef.add_role "cloud-controller-source"
+     end
+  end
 end
