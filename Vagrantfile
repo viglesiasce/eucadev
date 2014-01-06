@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
      config.vm.provision :chef_solo do |chef|
           chef.roles_path = "roles" 
           chef.add_role "cloud-in-a-box"
-          chef.json = { "eucalyptus" => { "install-type" => "packages",
+          chef.json = { "eucalyptus" => { "install-type" => "source",
                                           "source-branch" => "maint/3.4/testing",
                                           "network" => { 'public-ips' => "192.168.192.50-192.168.192.60" }
                                         }
