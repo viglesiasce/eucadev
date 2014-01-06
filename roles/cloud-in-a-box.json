@@ -4,10 +4,7 @@
   "json_class": "Chef::Role",
   "default_attributes": {
     "eucalyptus": {
-      "install-type": "source",
-      "source-branch": "maint/3.4/testing",
       "yum-options": "--nogpg",
-      "home-directory": "/opt/eucalyptus",
       "release-rpm": "http://release-repo.eucalyptus-systems.com/releases/eucalyptus/3.4/centos/6/x86_64/eucalyptus-release-internal-3.4-1.el6.noarch.rpm",
       "install-load-balancer": false,
       "nc": {
@@ -17,7 +14,7 @@
       "network": {
         "public-interface": "br0",
         "private-interface": "br0",
-        "public-ips": "10.0.1.200-10.0.1.210"
+        "bridged-nic":"eth1"
       }
     }
   },
@@ -27,10 +24,10 @@
   "run_list": [
     "recipe[eucalyptus]",
     "recipe[eucalyptus::cloud-controller]",
-    "recipe[eucalyptus::cluster-controller]",
+    "recipe[eucalyptus::node-controller]",
     "recipe[eucalyptus::storage-controller]",
     "recipe[eucalyptus::walrus]",
-    "recipe[eucalyptus::node-controller]",
+    "recipe[eucalyptus::cluster-controller]",
     "recipe[eucalyptus::register-components]",
     "recipe[eucalyptus::register-nodes]",
     "recipe[eucalyptus::create-first-resources]"
