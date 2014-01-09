@@ -1,7 +1,5 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-method = "package" # or "package"
-euca_interface = "eth1"
 options = {
   :cores => 2,
   :memory => 3072,
@@ -13,8 +11,17 @@ CENTOS = {
 OS = CENTOS
 Vagrant.configure("2") do |config|
     config.omnibus.chef_version = :latest
-    # Utilize the Berkshelf plugin to resolve cookbook dependencies.
     config.berkshelf.enabled = true
+    config.vm.provision "shell", path: "eucadev_prep.sh"
+     config.vm.provision :chef_solo do |chef|
+          chef.roles_path = "roles"
+          chef.add_role "cloud-in-a-box"
+          chef.json = { "eucalyptus" => { "install-type" => "source",
+                                          "source-branch" => "maint/3.4/testing",
+                                          "network" => { 'public-ips' => "192.168.192.50-192.168.192.60" }
+                                        }
+                     }
+     end
     config.vm.define "eucadev-all" do |u|
       u.vm.hostname = "eucadev-all"
       u.vm.box = OS[:box]
@@ -45,16 +52,6 @@ Vagrant.configure("2") do |config|
         aws.tags = {
                 Name: "EucaDev",
         } 
-     end
-      config.vm.provision "shell", path: "eucadev_prep.sh"
-     config.vm.provision :chef_solo do |chef|
-          chef.roles_path = "roles" 
-          chef.add_role "cloud-in-a-box"
-          chef.json = { "eucalyptus" => { "install-type" => "source",
-                                          "source-branch" => "maint/3.4/testing",
-                                          "network" => { 'public-ips' => "192.168.192.50-192.168.192.60" }
-                                        }
-                     }
      end
   end
 end
