@@ -13,15 +13,15 @@ Vagrant.configure("2") do |config|
     config.omnibus.chef_version = :latest
     config.berkshelf.enabled = true
     config.vm.provision "shell", path: "eucadev_prep.sh"
-     config.vm.provision :chef_solo do |chef|
-          chef.roles_path = "roles"
-          chef.add_role "cloud-in-a-box"
-          chef.json = { "eucalyptus" => { "install-type" => "source",
-                                          "source-branch" => "maint/3.4/testing",
-                                          "network" => { 'public-ips' => "192.168.192.50-192.168.192.60" }
-                                        }
-                     }
-     end
+    config.vm.provision :chef_solo do |chef|
+      chef.roles_path = "roles"
+      chef.add_role "cloud-in-a-box"
+      chef.json = { "eucalyptus" => { "install-type" => "source",
+                                      "source-branch" => "maint/3.4/testing",
+                                      "network" => { 'public-ips' => "192.168.192.50-192.168.192.60" }
+                                    }
+                 }
+    end
     config.vm.define "eucadev-all" do |u|
       u.vm.hostname = "eucadev-all"
       u.vm.box = OS[:box]
