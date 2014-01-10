@@ -5,7 +5,7 @@
   "default_attributes": {
     "eucalyptus": {
       "yum-options": "--nogpg",
-      "release-rpm": "http://release-repo.eucalyptus-systems.com/releases/eucalyptus/3.4/centos/6/x86_64/eucalyptus-release-internal-3.4-1.el6.noarch.rpm",
+      "eucalyptus-repo": "http://downloads.eucalyptus.com/software/eucalyptus/nightly/3.4/centos/6/x86_64/",
       "install-load-balancer": false,
       "nc": {
         "hypervisor": "qemu",
