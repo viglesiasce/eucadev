@@ -1,5 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+# Workaround for CHEF-4725
+class<<Vagrant::Util::TemplateRenderer;alias r render;def render(*a);r(*a)<<(a[0]=~/solo$/?"\nlog_location STDOUT":"");end;end
 options = {
   :cores => 2,
   :memory => 3072,
@@ -15,8 +17,10 @@ Vagrant.configure("2") do |config|
     config.vm.provision "shell", path: "eucadev_prep.sh"
     config.vm.provision :chef_solo do |chef|
       chef.roles_path = "roles"
-      chef.add_role "cloud-in-a-box"
-      chef.json = { "eucalyptus" => { "install-type" => "source",
+      chef.add_role "cloud-in-a-box"  
+      chef.json = { "eucalyptus" => { ## Choose whether to compile binaries from "source" or "packages"
+                                      "install-type" => "source",
+                                      ## Does not change package version, use "eucalyptus-repo" variable
                                       "source-branch" => "maint/3.4/testing",
                                       "network" => { 'public-ips' => "192.168.192.50-192.168.192.60" }
                                     }
