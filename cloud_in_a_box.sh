@@ -17,8 +17,8 @@ if [ -z "$role" ];then
 fi
 echo "Using Role: $role"
  
-wget http://euca-chef.s3.amazonaws.com/cookbooks.tgz -O cookbooks.tgz
-wget http://euca-chef.s3.amazonaws.com/ciab.json -O $role.json
+curl http://euca-chef.s3.amazonaws.com/cookbooks.tgz > cookbooks.tgz
+curl http://euca-chef.s3.amazonaws.com/ciab.json > $role.json
 sed -i "s/PUBLICIPS/$publicips/g" $role.json
 if [ ! -z "$bridge" ];then
     sed -i "s/eth0/$bridge/g" $role.json
