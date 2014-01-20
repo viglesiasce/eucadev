@@ -7,7 +7,7 @@ if [ -z "$publicips" ];then
     echo "Enter the available range of public IP addresses for your cloud, in the following format:"
     echo "  xxx.xxx.xxx.xxx-yyy.yyy.yyy.yyy"
     echo "  (Example: 192.168.1.100-192.168.1.199)"
-    read -t 10 publicips
+    read -t 30 publicips
     if [ "$?" -gt 0 ] ; then
         echo "Timeout waiting for IP address range"
         exit 1
