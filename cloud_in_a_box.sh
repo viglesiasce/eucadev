@@ -8,6 +8,9 @@ else
     echo "Using Public IPs: $publicips" 
 fi
 
+echo "Updating yum"
+yum update -y
+
 echo "Installing Chef"
 curl -L https://www.opscode.com/chef/install.sh | bash > chef-install.log
 
