@@ -55,8 +55,33 @@ This method produces a dev/test environment in a single virtual machine, with al
         TAG	instance	i-E4C54166	euca:node	10.0.2.15
         
   * **Note:** you won't be able to connect to cloud instances from your host, only from inside the VM.
+
+##### VMware Fusion
+
+It is possible to run EucaDev on VMware Fusion via Vagrant. Currently, this requires that you purchase a license for the fusion plug-in from HashiCorp. Assuming you've purchased the license, install the plug-in and activate it.
+
+        $ vagrant plugin install vagrant-vmware-fusion
+        $ vagrant plugin license vagrant-vmware-fusion license.lic
+
+You can use VMware Fusion Standard or Professional. In either case, you will need to _disable promiscuous mode authentication_:
+
+  * In *Fusion Standard*, create a file via 
+
+        $ sudo touch "/Library/Preferences/VMware Fusion/promiscAuthorized"
         
+     and restart Fusion.
+     
+  * In *Fusion Profressional*, go to `Preferences` -> `Network` and uncheck the box that says `Require authentication to enter promiscious mode`.
+
+When you move from one hypervisor to another while using the same EucaDev configuration, there may be a virtual network device on the host operating system that would have to be removed.
+
+  * When switching from *VirtualBox*: go to `Preferences` -> `Network` -> `Host-Only Network` and remove devices (e.g., `vboxnet0`) for the EucaDev VM that you no longer wish to deploy with VirtualBox. In our experience, one also had to restart the network devices that VMware Fusion controls:
+
+        $ sudo /Applications/VMware\ Fusion.app/Contents/Library/vmnet-cli --stop
+        $ sudo /Applications/VMware\ Fusion.app/Contents/Library/vmnet-cli --start
         
+  * When switching from *VMware Fusion*: go to `Preferences` -> `Network` and remove `vmnet2` under `Custom`.
+
 ### Dev/test environment in AWS or Eucalyptus
 
 This method produces a dev/test environment in a single cloud instance, with all components deployed in it. (Yes, you can run a Eucalyptus cloud in a Eucalyptus cloud or run a Eucalyptus cloud in an Amazon cloud. _Inception!_) By default, components will be built from latest source, which can be modified and immediately tested on the VM.  Alternatively, you can install from latest packages, saving time.
