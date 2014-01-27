@@ -56,28 +56,46 @@ This method produces a dev/test environment in a single virtual machine, with al
         
   * **Note:** you won't be able to connect to cloud instances from your host, only from inside the VM.
 
-* Make a change to the Node Controller and redeploy it:
+* Make a change to the code and redeploy it:
   * Source code for Eucalyptus is located under `eucalyptus-src` (relative to `eucadev` directory on the host and relative to `/vagrant` on the guest). Before making changes to it, we recommend creating a new git branch (which you can later turn into a pull request if you decide to contribute your change back). You can do this either inside the VM or on the host:
 
                 $ cd eucalyptus-src
                 $ git checkout -b my-bug-fix
 
-  * You can then edit the source code with your favorite editor for C language. As an experiment, go ahead and change the string `"spawning Eucalyptus node controller"` in `node/handlers.c` to say `"spawning my own Eucalyptus node controller"`.
-  * *Inside the VM*, rebuild, reinstall, and restart just the Node Controller:
+  * With your favorite C-language editor, change the Node Controller:
+    * As an experiment, go ahead and change the string `"spawning Eucalyptus node controller"` in `node/handlers.c` to say `"spawning my own Eucalyptus node controller"`.
+    * *Inside the VM*, rebuild, reinstall, and restart just the Node Controller:
 
                 # cd node
                 # make
                 # make install
                 # service eucalyptus-nc restart
        
-  * Inside the VM, verify that your change took effect:
+    * Inside the VM, verify that your change took effect:
   
                 # grep spawning /var/log/eucalyptus/nc.log 
                 2014-01-27 22:07:37  INFO | spawning Eucalyptus node controller v3.4.2 [built 2014-01-27 21:44:07+00:00]
                 2014-01-27 22:07:38  INFO | spawning monitoring thread
                 2014-01-27 22:33:55  INFO | spawning my own Eucalyptus node controller v3.4.2 [built 2014-01-27 22:33:22+00:00]
                 2014-01-27 22:33:55  INFO | spawning monitoring thread
+  * With your favorite Java editor, change the Cloud Controller:
+    * For serious work, you'll probably want to import the project into your IDE, such as IntelliJ or Eclipse. Pointing either one at the `eucalyptus-src` directory upon import and following prompts should get you to where the IDE can help you with syntax completion and compile errors. **Note:** do not try to build eucalyptus from the IDE unless you are on a Linux machine, though, as the system relies on Linux native bindings.
+
+    * As an experiment, go ahead and change the string `"Creating Bootstrapper instance."` in `clc/modules/msgs/src/main/java/com/eucalyptus/bootstrap/SystemBootstrapper.java` to say `"Creating my own Bootstrapper instance."`.
+    * *Inside the VM*, rebuild, reinstall, and restart just the Cloud Controller:
+
+                # cd clc
+                # make
+                # make install
+                # service eucalyptus-cloud restart
+       
+    * Inside the VM, verify that your change took effect:
+  
+                # grep "Creating my own" /var/log/eucalyptus/cloud-output.log 
+                2014-01-27 23:05:24  INFO | Creating my own Bootstrapper instance.
+                2014-01-27 23:05:52  INFO | Creating my own Bootstrapper instance.
   * **Note:** running `make install` from the root of the source tree will damage your installation because the configuration file will be overwritten by the default version.
+
 
 ##### VMware Fusion
 
