@@ -26,6 +26,7 @@ Vagrant.configure("2") do |config|
                                     }
                  }
     end
+    config.vm.provision "shell", path: "eucadev_post.sh"
     config.vm.define "eucadev-all" do |u|
       u.vm.hostname = "eucadev-all"
       u.vm.box = OS[:box]
