@@ -99,6 +99,8 @@ This method produces a dev/test environment in a single virtual machine, with al
 
 ##### VMware Fusion
 
+**Caveat:** the following instructions aren't immediately applicable as the current `Vagrantfile` does not accommodate `vmware_fusion` provider. Stay tuned for further changes.
+
 It is possible to run EucaDev on VMware Fusion via Vagrant. Currently, this requires that you purchase a license for the fusion plug-in from HashiCorp. Assuming you've purchased the license, install the plug-in and activate it.
 
         $ vagrant plugin install vagrant-vmware-fusion
