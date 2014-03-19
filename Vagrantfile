@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
                                       "install-type" => "packages",
                                       ## Does not change package version, use "eucalyptus-repo" variable
                                       "source-branch" => "testing",
-                                      "eucalyptus-repo" => "http://release-repo.eucalyptus-systems.com/releases/eucalyptus/nightly/4.0/centos/6/x86_64/",
+                                      "eucalyptus-repo" => "http://downloads.eucalyptus.com/software/eucalyptus/nightly/4.0/centos/6/x86_64/",
                                       "network" => { 'public-ips' => "192.168.192.50-192.168.192.60",
                                                      "dhcp-daemon" => "/usr/sbin/dhcpd" }
                                     }
