@@ -19,8 +19,6 @@ Vagrant.configure("2") do |config|
                                       "source-branch" => "testing",
                                       "eucalyptus-repo" => "http://downloads.eucalyptus.com/software/eucalyptus/nightly/4.0/centos/6/x86_64/",
                                       "euca2ools-repo" =>  "http://downloads.eucalyptus.com/software/euca2ools/nightly/3.1/centos/6/x86_64/",
-                                      "network" => { 'public-ips' => "192.168.192.50-192.168.192.60",
-                                                     "dhcp-daemon" => "/usr/sbin/dhcpd" }
                                     }
                  }
     end
