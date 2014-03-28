@@ -12,6 +12,12 @@
         "hypervisor": "qemu",
         "work-size": "50000"
       },
+      "topology": { "clusters": {"default": { "storage-backend": "overlay ",
+                                              "cc-1": "192.168.192.101",
+                                              "sc-1": "192.168.192.101",
+                                              "nodes": "192.168.192.101"}
+                                }
+                  },
       "network": {
         "public-interface": "br0",
         "private-interface": "br0",
