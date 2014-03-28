@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "eucadev-all" do |u|
       u.vm.hostname = "eucadev-all"
       u.vm.box = "euca-deps"
-      u.vm.box_url = "http://euca-vagrant.s3.amazonaws.com/euca-deps-virtualbox.box"
+      u.vm.box_url = "http://euca-vagrant.s3.amazonaws.com/euca-deps-vmware.box"
       u.vm.network :forwarded_port, guest: 8080, host: 8080
       u.vm.network :forwarded_port, guest: 8443, host: 8443
       u.vm.network :forwarded_port, guest: 8773, host: 8773
@@ -37,14 +37,14 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--memory", options[:memory].to_i]
       	v.customize ["modifyvm", :id, "--cpus", options[:cores].to_i]
       end
-      u.vm.provider :vmware_fusion do |v|
-        u.vm.box_url = "http://euca-vagrant.s3.amazonaws.com/euca-deps-vmware.box"
+      u.vm.provider :vmware_fusion do |v, override|
+        override.vm.box_url = "http://euca-vagrant.s3.amazonaws.com/euca-deps-vmware.box"
         v.vmx["memsize"] = options[:memory].to_i
         v.vmx["numvcpus"] = options[:cores].to_i
         v.vmx["vhv.enable"] = "true"
       end
-      u.vm.provider :aws do |aws,override|
-        u.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+      u.vm.provider :aws do |aws, override|
+        override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
 	aws.access_key_id = "XXXXXXXXXXXXXXXXXXXXXXX"
         aws.secret_access_key = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
         aws.instance_type = "cc1.4xlarge"
