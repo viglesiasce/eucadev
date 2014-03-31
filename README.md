@@ -10,7 +10,7 @@ This method produces a dev/test environment in a single virtual machine, with al
 
 1. Install [VirtualBox](https://www.virtualbox.org)
 
-2. Install [Vagrant](http://www.vagrantup.com/)
+2. Install [Vagrant 1.4.3](http://www.vagrantup.com/) *DOES NOT WORK WITH VAGRANT 1.5.x*
 
 3. Install [git](http://git-scm.com)
 
