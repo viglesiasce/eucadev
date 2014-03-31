@@ -29,19 +29,6 @@ echo "* hard nproc 64000" >>/etc/security/limits.conf
 rm /etc/security/limits.d/90-nproc.conf # these apparently override limits.conf?
 
 #
-# Configure the bridge to match the network setup
-# provided by the Vagrant configuration
-#
-echo "DEVICE=br0
-TYPE=Bridge
-ONBOOT=yes
-DELAY=0
-BOOTPROTO=static
-IPADDR=192.168.192.101
-NETMASK=255.255.255.0" >>/etc/sysconfig/network-scripts/ifcfg-br0
-service network restart
-
-#
 # Use ebtables to prevent traffic from leaving the
 # VM on the second NIC. (Otherwise, DHCP server provided
 # by VirtualBox will respond to requests from Eucalyptus

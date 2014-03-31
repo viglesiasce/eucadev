@@ -23,6 +23,7 @@
         "public-interface": "br0",
         "private-interface": "br0",
         "bridged-nic":"eth1", 
+        "bridge-ip": "192.168.192.101",
         "config-json": {
     "InstanceDnsDomain" : "eucalyptus.internal",
     "InstanceDnsServers": ["192.168.192.101"],
