@@ -8,6 +8,7 @@
       "eucalyptus-repo": "http://downloads.eucalyptus.com/software/eucalyptus/nightly/3.4/centos/6/x86_64/",
       "source-directory": "/vagrant/eucalyptus-src",
       "install-load-balancer": false,
+      "install-imaging-worker": false,
       "nc": {
         "hypervisor": "qemu",
         "work-size": "50000"
