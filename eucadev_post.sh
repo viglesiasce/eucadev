@@ -16,5 +16,5 @@ do
 	cp /root/$FILE /vagrant/creds/ # make copy
 done
 sed --in-place 's#://[^:]\+:#://127.0.0.1:#g' /vagrant/creds/eucarc # external copy should point to localhost
-
-
+source /root/eucarc
+euare-useraddloginprofile -u admin -p foobar

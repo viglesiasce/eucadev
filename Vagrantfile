@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
       u.vm.box = "euca-deps"
       u.vm.box_url = "http://euca-vagrant.s3.amazonaws.com/euca-deps-vmware.box"
       u.vm.network :forwarded_port, guest: 8080, host: 8080
-      u.vm.network :forwarded_port, guest: 8443, host: 8443
+      u.vm.network :forwarded_port, guest: 8888, host: 8888
       u.vm.network :forwarded_port, guest: 8773, host: 8773
       u.vm.network :forwarded_port, guest: 8774, host: 8774
       u.vm.network :forwarded_port, guest: 8775, host: 8775

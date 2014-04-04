@@ -38,13 +38,11 @@ This method produces a dev/test environment in a single virtual machine, with al
   * Become `root` to read the credentials: `$ sudo bash`
   * Source the Eucalyptus configuration file: `# source /root/eucarc`
   * Look up the IP of the running instnace: `# euca-describe-instances `
-  * Connect to the instance from the VM: `# ssh -i /root/my-first-keypair root@PUBLIC-IP-OF-THE-INSTANCE`
+  * Connect to the instance from the VM: `# ssh -i /root/my-first-keypair cirros@PUBLIC-IP-OF-THE-INSTANCE`
 
-* Connect to the Eucalyptus admin console: 
-  * In a Web browser on your host, go to `https://localhost:8443`
-  * Accept the untrusted server certificate
-  * Use `admin` for _both_ login and password
-  * After a forced change of the password to something other than `admin` you'll be good to go
+* Connect to the Eucalyptus user console:
+  * In a Web browser on your host, go to `http://localhost:8888`
+  * Login with account=eucalyptus, user=admin, password=foobar
   
 * Install [euca2ools](https://github.com/eucalyptus/euca2ools) on your host and control the cloud from the command line:
 
