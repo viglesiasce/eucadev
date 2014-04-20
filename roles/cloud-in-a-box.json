@@ -12,13 +12,15 @@
         "hypervisor": "qemu",
         "work-size": "50000"
       },
-      "topology": { "clusters": {"default": { "storage-backend": "overlay ",
+      "topology": {  "clc-1": "192.168.192.101", "walrus": "192.168.192.101", "user-facing": "192.168.192.101",
+                     "clusters": {"default": { "storage-backend": "overlay ",
                                               "cc-1": "192.168.192.101",
                                               "sc-1": "192.168.192.101",
                                               "nodes": "192.168.192.101"}
                                 }
                   },
       "network": {
+        "mode": "EDGE",
         "public-interface": "br0",
         "private-interface": "br0",
         "bridged-nic":"eth1", 
@@ -48,6 +50,7 @@
   "chef_type": "role",
   "run_list": [
     "recipe[eucalyptus::cloud-controller]",
+    "recipe[eucalyptus::register-components]",
     "recipe[eucalyptus::user-console]",
     "recipe[eucalyptus::storage-controller]",
     "recipe[eucalyptus::walrus]",
