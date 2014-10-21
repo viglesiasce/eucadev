@@ -1,0 +1,65 @@
+{
+  "name": "cloud-in-a-box",
+  "description": "",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+    "eucalyptus": {
+      "yum-options": "--nogpg",
+      "source-directory": "/vagrant/eucalyptus-src",
+      "install-load-balancer": false,
+      "install-imaging-worker": false,
+      "nc": {
+        "hypervisor": "qemu",
+        "work-size": "50000"
+      },
+      "topology": {  "clc-1": "192.168.192.101", "walrus": "192.168.192.101", "user-facing": "192.168.192.101",
+                     "clusters": {"default": { "storage-backend": "overlay ",
+                                              "cc-1": "192.168.192.101",
+                                              "sc-1": "192.168.192.101",
+                                              "nodes": "192.168.192.101"}
+                                }
+                  },
+      "network": {
+        "mode": "EDGE",
+        "public-interface": "br0",
+        "private-interface": "br0",
+        "bridged-nic":"eth1", 
+        "bridge-ip": "192.168.192.101",
+        "config-json": {
+    "InstanceDnsDomain" : "eucalyptus.internal",
+    "InstanceDnsServers": ["192.168.192.101"],
+    "PublicIps": ["192.168.192.110-192.168.192.160"],
+    "Subnets": [],
+    "Clusters": [
+        {
+            "Name": "default",
+            "MacPrefix": "d0:0d",
+            "Subnet": {
+                "Name": "192.168.192.0",
+                "Subnet": "192.168.192.0",
+                "Netmask": "255.255.255.0",
+                "Gateway": "192.168.192.101"
+            },
+            "PrivateIps": [ "192.168.192.10-192.168.192.80"]
+        }]}
+      }
+    }
+  },
+  "override_attributes": {
+  },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[eucalyptus::cloud-controller]",
+    "recipe[eucalyptus::register-components]",
+    "recipe[eucalyptus::user-console]",
+    "recipe[eucalyptus::storage-controller]",
+    "recipe[eucalyptus::walrus]",
+    "recipe[eucalyptus::cluster-controller]",
+    "recipe[eucalyptus::register-nodes]",
+    "recipe[eucalyptus::node-controller]",
+    "recipe[eucalyptus::configure]",
+    "recipe[eucalyptus::create-first-resources]"
+  ],
+  "env_run_lists": {
+  }
+}
